@@ -4,22 +4,29 @@ using namespace std;
 
 void DoublyLinkedList::print()
 {
-    while (head != NULL)
+    Node* curr=head;
+    while (curr != NULL)
     {
-        cout << head->data << " -> ";
-        head = head->next;
+        cout << curr->data << " -> ";
+        curr = curr->next;
     }
+    cout<<"Null";
+    cout<<endl;
 }
 void DoublyLinkedList::insert(int value)
 {
     Node *node = new Node(value);
-    if (head != nullptr)
-    {
-        head->prev = node;
-    }
-    head = node;
+ 
+    node->next = (this->head);
+    node->prev = NULL;
+    if ((this->head) !=nullptr)
+        (this->head)->prev = node;
+ 
+    /* 5. move the head to point to the new node */
+    (this->head) = node;
 }
-Node* DoublyLinkedList::searchNode(int val){
+Node* DoublyLinkedList::searchNode(int val)
+{
         Node* curr=head;
         while(curr!=nullptr){
             if(curr->data==val){
@@ -32,7 +39,7 @@ Node* DoublyLinkedList::searchNode(int val){
     }
 void DoublyLinkedList::deleteVal(int value)
 {
-    Node *temp = searchNode( value );
+    Node *temp = this->searchNode( value );
     if ( temp != nullptr )
     {
         if ( temp->next != nullptr )
