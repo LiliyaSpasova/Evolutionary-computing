@@ -11,7 +11,7 @@ length=40
 populationSize=1200
 isUniformCrossover=False
 isTighlyLinked=False
-fitness=1
+fitness=0
 Iterations=30
 
 fitnessCalculations=[]
