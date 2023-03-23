@@ -14,8 +14,10 @@ class FM:
         self.rightBucket={}
         self.partition=""
         self.lockedVertices=[]
+
     def getPart(self,id):
         return self.partition[id-1]
+
     def calculateCost(self,vertex):
         cost=0
         part=self.getPart(vertex.id)
@@ -24,9 +26,11 @@ class FM:
             if neigbourPart!=part:
                 cost+=1
         return cost
+
     def calculateGain(self,vertex):
         cost=self.calculateCost(vertex)
         return cost-vertex.numNeighbours
+
     def getMaxCost(self):
         maxcost=-1
         for v in self.g.vertices:
@@ -34,9 +38,11 @@ class FM:
             if maxcost<cost:
                 maxcost=cost
         return maxcost
+
     def initializaBuckets(self,maxCost):
         self.rightBucket = {i: set() for i in range(maxCost, -maxCost - 1, -1)}
         self.leftBucket = {i: set() for i in range(maxCost, -maxCost - 1, -1)}
+
     def fillBuckets(self):
         for v in self.g.vertices:
             part=self.getPart(v.id)
@@ -45,10 +51,13 @@ class FM:
                 self.leftBucket[gain].add(v.id)
             else:
                 self.rightBucket[gain].add(v.id)
+    
     def moveVertex(self):
         return -1
+
     def recalculateBuckets(self):
         return -1
+        
     def FM_pass(self):
         self.g.serealize()
         self.partition=createPartition()
