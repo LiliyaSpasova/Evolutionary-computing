@@ -3,8 +3,10 @@ class Vertex:
         self.id=-1
         self.coordinates=(None,None)
         self.neighbours=[]
+        self.numNeighbours=-1
 def remove_spaces(splitLines):
     res = [i for i in splitLines if i != '']
+    res = [i for i in res if i != '\n']
     return res
 class Graph:
     def __init__(self):
@@ -17,13 +19,12 @@ class Graph:
             v=Vertex()
             splitLine=line.split(' ')
             splitLine=remove_spaces(splitLine)
-            id=splitLine[0]
+            id=int(splitLine[0])
             coordinates=splitLine[1]
+            v.numNeighbours=int(splitLine[2])
             neighbours=[]
             for i in range(3,len(splitLine)):
-               if (i==len(splitLine)-1):
-                   splitLine[i]=splitLine[i].replace("\n","")
-               neighbours.append(splitLine[i])
+               neighbours.append(int(splitLine[i]))
             v.id=id
             v.neighbours=neighbours
             v.coordinates=coordinates

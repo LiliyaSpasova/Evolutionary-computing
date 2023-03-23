@@ -1,9 +1,9 @@
 from List import Node
 from List import DoubleLinkedList
 from Graph import Graph
+from FM import FM
 def main():
-    g=Graph()
-    g.serealize()
-    x=5
+    fm=FM()
+    fm.FM_pass()
 main()
     
