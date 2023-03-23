@@ -26,7 +26,7 @@ class FM:
         return cost
     def calculateGain(self,vertex):
         cost=self.calculateCost(vertex)
-        return cost-vertex.numNeighbours
+        return cost-(vertex.numNeighbours-cost)
     def getMaxCost(self):
         maxcost=-1
         for v in self.g.vertices:
