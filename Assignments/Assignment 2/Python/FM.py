@@ -1,22 +1,17 @@
 from Graph import Vertex
 from Graph import Graph
-import random
+import helpers
 # 0 is left bucket
 #1 is right bucket
-def createPartition():
-    length = 250
-    partition = [0] * length + [1] * length
-    random.shuffle(partition)
-    return partition
-
 class FM:
-    def __init__(self) -> None:
-        self.g=Graph()
+    def __init__(self,allowedPasses,graph,partition) -> None:
+        self.g=graph
         self.leftBucket={}
         self.rightBucket={}
-        self.partition=""
+        self.partition=partition
         self.lockedVertices=[]
         self.solutions=[]
+        self.allowedPasses=allowedPasses
 
     def getPart(self,id,partition):
         return partition[id-1]
@@ -37,7 +32,7 @@ class FM:
     def getMaxCost(self):
         maxcost=-1
         for v in self.g.vertices:
-            cost=self.calculateCost(v,self.partition)
+            cost = v.numNeighbours
             if maxcost<cost:
                 maxcost=cost
         return maxcost
@@ -55,7 +50,14 @@ class FM:
             else:
                 self.rightBucket[gain].add(v.id)
     def areBucketsEmpty(self):
-        return False
+        for (_,values) in self.leftBucket.items():
+            if len(values)>0:
+                return False
+        for (_,values) in self.rightBucket.items():
+             if len(values)>0:
+                return False
+        return True
+    
     def pickVertex(self,bucket):
         for (key,values) in bucket.items():
             if len(values)!=0:
@@ -65,61 +67,80 @@ class FM:
                 bucket[key].remove(vertices[0])
                 return value
     def moveVertex(self,src):
+        prevPartition=self.partition.copy()
+        prevGains=[]
+        newGains=[]
         if (src==0):
             vertexId=self.pickVertex(self.leftBucket)
-            vertex=self.getVertex(vertexId)
-            prevGains=[]
-            newGains=[]
-            for n in vertex.neighbours:
-                gain = self.calculateGain(self.getVertex(n),self.partition)
-                prevGains.append((n,gain))
             self.partition[vertexId-1]=1
+            vertex=self.getVertex(vertexId)
             for n in vertex.neighbours:
-                gain = self.calculateGain(self.getVertex(n),self.partition)
-                newGains.append((n,gain))
-            
+                if n not in self.lockedVertices:
+                    prevGain = self.calculateGain(self.getVertex(n),prevPartition)
+                    newGain = self.calculateGain(self.getVertex(n),self.partition)
+                    prevGains.append((n,prevGain))
+                    newGains.append((n,newGain))
         else:
             vertexId=self.pickVertex(self.rightBucket)
-            vertex=self.getVertex(vertexId)
-            prevGains=[]
-            newGains=self.calculateGain(vertex,self.partition)
-            for n in vertex.neighbours:
-                gain = self.calculateGain(self.getVertex(n),self.partition)
-                prevGains.append((n,gain))
             self.partition[vertexId-1]=0
+            vertex=self.getVertex(vertexId)
             for n in vertex.neighbours:
-                gain = self.calculateGain(self.getVertex(n),self.partition)
-                newGains.append((n,gain))
+                if n not in self.lockedVertices:
+                    prevGain = self.calculateGain(self.getVertex(n),prevPartition)
+                    newGain = self.calculateGain(self.getVertex(n),self.partition)
+                    prevGains.append((n,prevGain))
+                    newGains.append((n,newGain))
         self.alterBuckets(prevGains,newGains)
     def getVertex(self,id):
-        return self.g.vertices[id]
+        return self.g.vertices[id-1]
     def alterBuckets(self,prevGains,newGains):
-        for ((v,prevGain),(v,newGain)) in (prevGains,newGains):
-            x=5
+        for ((v,prevGain),(v,newGain)) in zip(prevGains,newGains):
+            part=self.getPart(v,self.partition)
+            if (part==0):
+                self.leftBucket[prevGain].remove(v)
+                self.leftBucket[newGain].add(v)
+            else:
+                self.rightBucket[prevGain].remove(v)
+                self.rightBucket[newGain].add(v)
     def calculateFitness(self,partition):
         res=0
         for v in self.g.vertices:
             res+=self.calculateCost(v,partition)
+        return res
+    def pickBestSolution(self):
+        minCut=1000000
+        bestSolution=None
+        for (cut,solution) in self.solutions:
+            if minCut>cut:
+                minCut=cut
+                bestSolution=solution
+        return (minCut,bestSolution)
+    
     def FM_pass(self):
-        self.g.serealize()
-        self.partition=createPartition()
-        maxCost=self.getMaxCost()
-        self.initializaBuckets(maxCost)
-        self.fillBuckets()
         src=0
         counter=0
-        while(not self.areBucketsEmpty()):
+        for _ in range(0,self.allowedPasses):
             self.moveVertex(src)
-            self.recalculateBuckets()
             if src==0:
                 src=1
             else:
                 src=0
             counter+=1
             if counter==2:
-                self.solutions.append((self.calculateFitness(self.partition),self.partition))
+                partCopy=self.partition.copy()
+                fitness = self.calculateFitness(partCopy)
+                self.solutions.append((fitness,partCopy))
                 counter=0
-            
+            if len(self.lockedVertices)==500:
+                break
+        bestSoltution=self.pickBestSolution() 
+        fitness = self.calculateFitness(bestSoltution[1])
+        return ((fitness,bestSoltution[1]))
+    
+    def FM_run(self):
+        maxCost=self.getMaxCost()
+        self.initializaBuckets(maxCost)
+        self.fillBuckets()
+        return self.FM_pass()
 
-                
 

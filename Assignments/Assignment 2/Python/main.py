@@ -1,9 +1,16 @@
 from List import Node
 from List import DoubleLinkedList
 from Graph import Graph
-from FM import FM
+from MLS import MLS
+from GLS import GLS
+from ILS import ILS
+
+timesToRestartMLS=300
+
 def main():
-    fm=FM()
-    fm.FM_pass()
+    g=Graph()
+    g.serealize()
+    mls=MLS(g,timesToRestartMLS)
+    bestSolutionn=mls.MLS_run()
 main()
     
