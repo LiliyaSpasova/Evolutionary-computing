@@ -66,6 +66,7 @@ class FM:
                 self.lockedVertices.append(value)
                 bucket[key].remove(vertices[0])
                 return value
+            
     def moveVertex(self,src):
         prevPartition=self.partition.copy()
         prevGains=[]
@@ -91,8 +92,10 @@ class FM:
                     prevGains.append((n,prevGain))
                     newGains.append((n,newGain))
         self.alterBuckets(prevGains,newGains)
+        
     def getVertex(self,id):
         return self.g.vertices[id-1]
+    
     def alterBuckets(self,prevGains,newGains):
         for ((v,prevGain),(v,newGain)) in zip(prevGains,newGains):
             part=self.getPart(v,self.partition)
@@ -102,11 +105,13 @@ class FM:
             else:
                 self.rightBucket[prevGain].remove(v)
                 self.rightBucket[newGain].add(v)
+    
     def calculateFitness(self,partition):
         res=0
         for v in self.g.vertices:
             res+=self.calculateCost(v,partition)
-        return res
+        return res/2
+    
     def pickBestSolution(self):
         minCut=1000000
         bestSolution=None

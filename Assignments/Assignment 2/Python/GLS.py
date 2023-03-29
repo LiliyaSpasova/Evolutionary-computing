@@ -5,13 +5,13 @@ import random
 
 def crossover(m1,m2):
     dist=getHammingDistance(m1,m2)
-    len = len(m1)
-    res=[-1 for _ in range(0,len)]
-    if dist>len/2:
+    l1 = len(m1)
+    res=[-1 for _ in range(0,l1)]
+    if dist>l1/2:
         m1=invertBits(m1)
     counter=0
-    zerosLeft=len/2
-    onesLeft=len/2
+    zerosLeft=l1/2
+    onesLeft=l1/2
     for (i,j) in zip(m1,m2):
         if i==j:
             res[counter]=i
@@ -54,29 +54,37 @@ def invertBits (member):
     return a
 
 class GLS:
-    def __init__(self,graph,populationsSize,FMPassesAllowed) -> None:
+    def __init__(self,graph,populationsSize,fmPassesPerChild) -> None:
         self.graph=graph
         self.populationSize=populationsSize
         self.population=[]
-        self.FMPassesAllowed=FMPassesAllowed
+        self.fmPassesPerChild=fmPassesPerChild
     
     def GLSPass(self):
-        parents=random.sample(self.population, 2)
-        child=crossover(parents[0],parents[1])
-        fm=FM(graph=self.graph,allowedPasses=self.FMPassesAllowed,partition=child)
-        (_,solution)=fm.FM_run()
-        self.population.append(solution)
-        competition=[]
-        for p in self.population:
-            fm=FM(graph=self.graph,allowedPasses=self.FMPassesAllowed,partition=p)
-            competition.append((fm.calculateFitness(),p))
-        sortedCompetition = sorted(competition)
+        for _ in range (0,self.populationSize-1,2):
+            parents=random.sample(self.population, 2)
+            child=crossover(parents[0],parents[1])
+            fm=FM(graph=self.graph,allowedPasses=self.fmPassesPerChild,partition=child)
+            (_,solution)=fm.FM_run()
+            self.population.append(solution)
+            competition=[]
+            for p in self.population:
+                fm=FM(graph=self.graph,allowedPasses=self.fmPassesPerChild,partition=p)
+                competition.append((fm.calculateFitness(p),p))
+            sortedCompetition = sorted(competition)
         return sortedCompetition[0:50]
     
     def runGLS(self):
-        for _ in range(0,self.poulationSize):
+        for _ in range(0,self.populationSize):
             partition=helpers.createPartition()
             self.population.append(partition)
+        #25 children per generation, with 80 FM passes each = 2000, so we do it 5 times 
+        for _ in range (0,int(10000/(self.populationSize/2)/self.fmPassesPerChild)):
+            sorted=self.GLSPass()
+            self.population=[]
+            for (f,p) in sorted:
+                self.population.append(p)
+        return sorted[0]
         
 
         
