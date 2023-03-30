@@ -20,8 +20,8 @@ def main():
     for _ in range (0,25):
         mls=MLS(g,timesToRestartMLS)
         mlsSolutions.append(mls.MLS_run())
-        gls=GLS(g,glsPopulationSize,glsFMPassesPerChild)
-        glsSolutions.append(gls.runGLS())
+        #gls=GLS(g,glsPopulationSize,glsFMPassesPerChild)
+       # glsSolutions.append(gls.runGLS())
     t1 = time.time()
     totalTime = t1-t0  
     print(totalTime)

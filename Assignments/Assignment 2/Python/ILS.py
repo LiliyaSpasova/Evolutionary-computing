@@ -2,11 +2,12 @@ from FM import FM
 import helpers
 
 class ILS:
-    def __init__(self,graph,timesToRestart) -> None:
+    def __init__(self,graph,timesToRestart,mutationRate) -> None:
         self.timesToRestart=timesToRestart
         self.graph=graph
         self.FMPassesAllowed=int(10000/timesToRestart)*2
         self.solutions=[]
+        self.mutationRate=mutationRate
     def ILS_pass (self):
         return -1
     def pickBestSolution(self):
@@ -17,6 +18,7 @@ class ILS:
                 bestSolution=(f,s)
                 minCut=f
         return bestSolution
+    
     def ILS_run (self):
         for i in range(0,self.timesToRestart):
             partition=helpers.createPartition()

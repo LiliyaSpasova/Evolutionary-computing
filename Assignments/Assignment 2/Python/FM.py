@@ -1,6 +1,7 @@
 from Graph import Vertex
 from Graph import Graph
 import helpers
+import random
 # 0 is left bucket
 #1 is right bucket
 class FM:
@@ -62,6 +63,7 @@ class FM:
         for (key,values) in bucket.items():
             if len(values)!=0:
                 vertices=list(bucket[key])
+                random.shuffle(vertices)
                 value = vertices[0]
                 self.lockedVertices.append(value)
                 bucket[key].remove(vertices[0])
@@ -122,9 +124,11 @@ class FM:
         return (minCut,bestSolution)
     
     def FM_pass(self):
+        self.solutions=[]
+        self.lockedVertices=[]
         src=0
         counter=0
-        for _ in range(0,self.allowedPasses):
+        while len(self.lockedVertices)!=500:
             self.moveVertex(src)
             if src==0:
                 src=1
@@ -136,16 +140,18 @@ class FM:
                 fitness = self.calculateFitness(partCopy)
                 self.solutions.append((fitness,partCopy))
                 counter=0
-            if len(self.lockedVertices)==500:
-                break
         bestSoltution=self.pickBestSolution() 
         fitness = self.calculateFitness(bestSoltution[1])
         return ((fitness,bestSoltution[1]))
-    
     def FM_run(self):
-        maxCost=self.getMaxCost()
-        self.initializaBuckets(maxCost)
-        self.fillBuckets()
-        return self.FM_pass()
-
+        solutions=[]
+        solutions.append((self.calculateFitness(self.partition),self.partition))
+        for _ in range (0,self.allowedPasses):
+            maxCost=self.getMaxCost()
+            self.initializaBuckets(maxCost)
+            self.fillBuckets()
+            (minCut,partition)=self.FM_pass()
+            solutions.append((minCut,partition.copy()))
+            self.partition=partition
+        return (minCut,self.partition)
 

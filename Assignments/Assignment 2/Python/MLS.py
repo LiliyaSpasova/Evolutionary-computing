@@ -5,7 +5,7 @@ class MLS:
     def __init__(self,graph,timesToRestart) -> None:
         self.timesToRestart=timesToRestart
         self.graph=graph
-        self.FMPassesAllowed=int(10000/timesToRestart)*2
+        self.FMPassesAllowed=int(10000/timesToRestart)
         self.solutions=[]
     def pickBestSolution(self):
         minCut=1000
@@ -20,6 +20,8 @@ class MLS:
             partition=helpers.createPartition()
             fm=FM(graph=self.graph,allowedPasses=self.FMPassesAllowed,partition=partition)
             (fitness,solution)=fm.FM_run()
+            print (i, (fitness,solution))
             self.solutions.append((fitness,solution))
+            print(self.solutions)
         bestSolution=self.pickBestSolution()
         return bestSolution
