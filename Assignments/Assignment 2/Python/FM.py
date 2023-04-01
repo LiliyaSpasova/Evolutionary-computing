@@ -63,7 +63,6 @@ class FM:
         for (key,values) in bucket.items():
             if len(values)!=0:
                 vertices=list(bucket[key])
-                random.shuffle(vertices)
                 value = vertices[0]
                 self.lockedVertices.append(value)
                 bucket[key].remove(vertices[0])
@@ -107,6 +106,17 @@ class FM:
             else:
                 self.rightBucket[prevGain].remove(v)
                 self.rightBucket[newGain].add(v)
+        for k in self.leftBucket.keys():
+            vertices=list(self.leftBucket[k])
+            random.shuffle(vertices)
+            self.leftBucket[k].clear()
+            self.leftBucket[k]=set(vertices)
+        for k in self.rightBucket.keys():
+            vertices=list(self.rightBucket[k])
+            random.shuffle(vertices)
+            self.rightBucket[k].clear()
+            self.rightBucket[k]=set(vertices)
+    
     
     def calculateFitness(self,partition):
         res=0

@@ -12,7 +12,7 @@ class Graph:
     def __init__(self):
         self.vertices=[]
     def serealize(self):
-        file1 = open("Assignment 2\Python\graphData.txt", 'r')
+        file1 = open("graphData.txt", 'r')
         Lines = file1.readlines()
         # Strips the newline character
         for line in Lines:

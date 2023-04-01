@@ -61,16 +61,16 @@ class GLS:
         self.fmPassesPerChild=fmPassesPerChild
     
     def GLSPass(self):
-        for _ in range (0,self.populationSize-1,2):
-            parents=random.sample(self.population, 2)
-            child=crossover(parents[0],parents[1])
+        random.shuffle(self.population)
+        for i in range (0,self.populationSize-1,2):
+            child=crossover(self.population[i],self.population[i+1])
             fm=FM(graph=self.graph,allowedPasses=self.fmPassesPerChild,partition=child)
             (_,solution)=fm.FM_run()
             self.population.append(solution)
-            competition=[]
-            for p in self.population:
-                fm=FM(graph=self.graph,allowedPasses=self.fmPassesPerChild,partition=p)
-                competition.append((fm.calculateFitness(p),p))
+        competition=[]
+        for p in self.population:
+            fm=FM(graph=self.graph,allowedPasses=self.fmPassesPerChild,partition=p)
+            competition.append((fm.calculateFitness(p),p))
             sortedCompetition = sorted(competition)
         return sortedCompetition[0:50]
     
@@ -83,6 +83,7 @@ class GLS:
             sorted=self.GLSPass()
             self.population=[]
             for (f,p) in sorted:
+                print((f,p))
                 self.population.append(p)
         return sorted[0]
         

@@ -16,12 +16,13 @@ class MLS:
                 minCut=f
         return bestSolution
     def MLS_run (self):
+        print("Start MLS")
         for i in range(0,self.timesToRestart):
             partition=helpers.createPartition()
             fm=FM(graph=self.graph,allowedPasses=self.FMPassesAllowed,partition=partition)
             (fitness,solution)=fm.FM_run()
             print (i, (fitness,solution))
             self.solutions.append((fitness,solution))
-            print(self.solutions)
+           # print(self.solutions)
         bestSolution=self.pickBestSolution()
         return bestSolution
