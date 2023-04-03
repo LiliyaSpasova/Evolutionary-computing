@@ -1,5 +1,6 @@
-from FM import FM
+#from FM import FM
 import helpers
+from FM_3 import FM
 
 class MLS:
     def __init__(self,graph,timesToRestart) -> None:
@@ -10,19 +11,23 @@ class MLS:
     def pickBestSolution(self):
         minCut=1000
         bestSolution=-1
-        for (f,s) in self.solutions:
+        for (s,f) in self.solutions:
             if f<minCut:
-                bestSolution=(f,s)
+                bestSolution=(s,f)
                 minCut=f
-        return bestSolution
+        return bestSolution[1]
     def MLS_run (self):
         print("Start MLS")
         for i in range(0,self.timesToRestart):
             partition=helpers.createPartition()
+           # print(partition)
+            #sol, cuts = runFM(self.FMPassesAllowed, partition)
             fm=FM(graph=self.graph,allowedPasses=self.FMPassesAllowed,partition=partition)
-            (fitness,solution)=fm.FM_run()
-            print (i, (fitness,solution))
-            self.solutions.append((fitness,solution))
-           # print(self.solutions)
+            ( cuts,sol, )=fm.FM_run()
+            #fm=FM(graph=self.graph,allowedPasses=self.FMPassesAllowed,partition=partition)
+            #res=fm.FM_run()
+           # print (i,(  cuts))
+            self.solutions.append((sol, cuts))
+            #print(self.solutions)
         bestSolution=self.pickBestSolution()
         return bestSolution

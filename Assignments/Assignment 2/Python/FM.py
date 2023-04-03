@@ -13,6 +13,9 @@ class FM:
         self.lockedVertices=[]
         self.solutions=[]
         self.allowedPasses=allowedPasses
+        self.minCut=10000
+        self.bestSolution=None
+        self.bestIteration=-1
 
     def getPart(self,id,partition):
         return partition[id-1]
@@ -124,20 +127,12 @@ class FM:
             res+=self.calculateCost(v,partition)
         return res/2
     
-    def pickBestSolution(self):
-        minCut=1000000
-        bestSolution=None
-        for (cut,solution) in self.solutions:
-            if minCut>cut:
-                minCut=cut
-                bestSolution=solution
-        return (minCut,bestSolution)
-    
     def FM_pass(self):
         self.solutions=[]
         self.lockedVertices=[]
         src=0
         counter=0
+        i=0
         while len(self.lockedVertices)!=500:
             self.moveVertex(src)
             if src==0:
@@ -148,11 +143,13 @@ class FM:
             if counter==2:
                 partCopy=self.partition.copy()
                 fitness = self.calculateFitness(partCopy)
-                self.solutions.append((fitness,partCopy))
+                if (fitness<self.minCut):
+                    self.minCut=fitness
+                    self.bestSolution=partCopy
+                    self.bestIteration=i
                 counter=0
-        bestSoltution=self.pickBestSolution() 
-        fitness = self.calculateFitness(bestSoltution[1])
-        return ((fitness,bestSoltution[1]))
+            i+=1
+        return ((self.minCut,self.bestSolution))
     def FM_run(self):
         solutions=[]
         solutions.append((self.calculateFitness(self.partition),self.partition))

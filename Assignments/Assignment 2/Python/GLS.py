@@ -1,4 +1,4 @@
-from FM import FM
+from FM_3 import FM
 import helpers
 import numpy as np
 import random
@@ -54,25 +54,44 @@ def invertBits (member):
     return a
 
 class GLS:
-    def __init__(self,graph,populationsSize,fmPassesPerChild) -> None:
+    def __init__(self,graph,populationsSize,fmPassesPerChild,isModified) -> None:
         self.graph=graph
         self.populationSize=populationsSize
         self.population=[]
         self.fmPassesPerChild=fmPassesPerChild
-    
+        self.isModified=isModified
+    def removeDuplicates(self,lst):
+           return [[a, b] for i, [a, b] in enumerate(lst)  if not any(c == b for _, c in lst[:i])]
     def GLSPass(self):
         random.shuffle(self.population)
-        for i in range (0,self.populationSize-1,2):
-            child=crossover(self.population[i],self.population[i+1])
-            fm=FM(graph=self.graph,allowedPasses=self.fmPassesPerChild,partition=child)
-            (_,solution)=fm.FM_run()
-            self.population.append(solution)
+        if (self.isModified):
+            for i in range (0,int(self.populationSize/2)):
+                parents=random.sample(self.population,2)
+                while(parents[0]==parents[1]):
+                    parents=random.sample(self.population,2)
+                child=crossover(parents[0],parents[1])
+                fm=FM(graph=self.graph,allowedPasses=self.fmPassesPerChild,partition=child)
+                (_,solution)=fm.FM_run()
+                self.population.append(solution)
+        else:
+            random.shuffle(self.population)
+            for i in range (0,self.populationSize-1,2):
+                child=crossover(self.population[i],self.population[i+1])
+                fm=FM(graph=self.graph,allowedPasses=self.fmPassesPerChild,partition=child)
+                (_,solution)=fm.FM_run()
+                self.population.append(solution)
         competition=[]
         for p in self.population:
             fm=FM(graph=self.graph,allowedPasses=self.fmPassesPerChild,partition=p)
             competition.append((fm.calculateFitness(p),p))
             sortedCompetition = sorted(competition)
-        return sortedCompetition[0:50]
+        if (self.isModified):
+            noduplicates = self.removeDuplicates(sortedCompetition)
+            best = noduplicates[0:int(self.populationSize/2)]
+            duplicated =  [val for val in best for _ in (0, 1)]
+            return duplicated
+        else:
+            return sortedCompetition[0:int(self.populationSize)]
     
     def runGLS(self):
         for _ in range(0,self.populationSize):
@@ -83,7 +102,7 @@ class GLS:
             sorted=self.GLSPass()
             self.population=[]
             for (f,p) in sorted:
-                print((f,p))
+               # print((f,p))
                 self.population.append(p)
         return sorted[0]
         
