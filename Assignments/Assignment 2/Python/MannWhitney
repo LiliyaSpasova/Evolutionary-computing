@@ -1,0 +1,4 @@
+algorithms,U statistic,p-value
+mls_ils,94.0,2.136016412484729e-05
+mls_gls,606.5,1.046750168411317e-08
+ils_gls,612.5,5.474892980946754e-09

@@ -1,4 +1,4 @@
-from FM_3 import FM
+from FM_2 import FM
 import helpers
 import numpy as np
 import random

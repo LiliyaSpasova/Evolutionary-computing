@@ -2,10 +2,11 @@ from Graph import Vertex
 from Graph import Graph
 import helpers
 import random
+import time
 # 0 is left bucket
 #1 is right bucket
 class FM:
-    def __init__(self,allowedPasses,graph,partition) -> None:
+    def __init__(self,allowedPasses,graph,partition,timer=None) -> None:
         self.g=graph
         self.leftBucket={}
         self.rightBucket={}
@@ -15,6 +16,7 @@ class FM:
         self.cut=None
         self.minCut=100000
         self.bestSolution=None
+        self.timer=timer
 
     def initializaBuckets(self,maxCost):
         self.rightBucket = {i: set() for i in range(maxCost, -maxCost - 1, -1)}
@@ -153,16 +155,31 @@ class FM:
     def FM_run(self):
         solutions=[]
         solutions.append((100000,self.partition))
-        for _ in range (0,self.allowedPasses):
-            self.reset()
-            self.setPartitions()
-            self.setGains()
-            self.initializaBuckets(self.g.maxGain)
-            self.setBuckets()
-            self.cut=self.getTotalCut()
-            (cut,solution)=self.FM_pass()
-            self.partition=solution.copy()
-            solutions.append((cut,solution.copy()))
+        if self.timer is None:
+            for _ in range (0,self.allowedPasses):
+                self.reset()
+                self.setPartitions()
+                self.setGains()
+                self.initializaBuckets(self.g.maxGain)
+                self.setBuckets()
+                self.cut=self.getTotalCut()
+                (cut,solution)=self.FM_pass()
+                self.partition=solution.copy()
+                solutions.append((cut,solution.copy()))
+        else:
+            start=time.time()
+            while True:
+                self.reset()
+                self.setPartitions()
+                self.setGains()
+                self.initializaBuckets(self.g.maxGain)
+                self.setBuckets()
+                self.cut=self.getTotalCut()
+                (cut,solution)=self.FM_pass()
+                self.partition=solution.copy()
+                solutions.append((cut,solution.copy()))
+                if time.time()>start+self.timer:
+                    break
         return ((cut,solution.copy()))
 
 
